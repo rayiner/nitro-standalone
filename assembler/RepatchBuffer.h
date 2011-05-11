@@ -30,12 +30,12 @@
 #ifndef RepatchBuffer_h
 #define RepatchBuffer_h
 
-#include "assembler/wtf/Platform.h"
+#include "../wtf/Platform.h"
 
 #if ENABLE_ASSEMBLER
 
-#include <assembler/MacroAssembler.h>
-#include <moco/MocoStubs.h> //MOCO
+#include "MacroAssembler.h"
+#include "../moco/MocoStubs.h" //MOCO
 
 namespace JSC {
 

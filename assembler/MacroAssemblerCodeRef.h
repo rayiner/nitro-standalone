@@ -30,8 +30,10 @@
 #ifndef MacroAssemblerCodeRef_h
 #define MacroAssemblerCodeRef_h
 
-#include "assembler/wtf/Platform.h"
-#include "assembler/jit/ExecutableAllocator.h"
+#include <stdint.h>
+
+#include "../wtf/Platform.h"
+#include "../jit/ExecutableAllocator.h"
 
 #if ENABLE_ASSEMBLER
 
@@ -164,8 +166,8 @@ public:
     ptrdiff_t operator -(const MacroAssemblerCodePtr &other) const
     {
         JS_ASSERT(m_value);
-        return reinterpret_cast<uint8 *>(m_value) -
-               reinterpret_cast<uint8 *>(other.m_value);
+        return reinterpret_cast<uint8_t *>(m_value) -
+               reinterpret_cast<uint8_t *>(other.m_value);
     }
 
 private:

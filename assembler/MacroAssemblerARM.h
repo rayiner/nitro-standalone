@@ -32,7 +32,7 @@
 #ifndef MacroAssemblerARM_h
 #define MacroAssemblerARM_h
 
-#include "assembler/wtf/Platform.h"
+#include "../wtf/Platform.h"
 
 #if ENABLE_ASSEMBLER && WTF_CPU_ARM_TRADITIONAL
 

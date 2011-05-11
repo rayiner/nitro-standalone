@@ -30,8 +30,8 @@
 #ifndef CodeLocation_h
 #define CodeLocation_h
 
-#include "assembler/wtf/Platform.h"
-#include "assembler/assembler/MacroAssemblerCodeRef.h"
+#include "../wtf/Platform.h"
+#include "../assembler/MacroAssemblerCodeRef.h"
 
 #if ENABLE_ASSEMBLER
 

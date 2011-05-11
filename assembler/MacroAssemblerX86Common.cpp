@@ -37,7 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "assembler/wtf/Platform.h"
+#include "../wtf/Platform.h"
 
 /* SSE checks only make sense on Intel platforms. */
 #if WTF_CPU_X86 || WTF_CPU_X86_64

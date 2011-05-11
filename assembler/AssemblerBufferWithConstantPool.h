@@ -31,15 +31,13 @@
 #ifndef AssemblerBufferWithConstantPool_h
 #define AssemblerBufferWithConstantPool_h
 
-#include "assembler/wtf/Platform.h"
+#include "../wtf/Platform.h"
 
 #if ENABLE_ASSEMBLER
 
 #include "AssemblerBuffer.h"
-#include "assembler/wtf/SegmentedVector.h"
-#include "assembler/wtf/Assertions.h"
-
-#include "methodjit/Logging.h"
+#include "../wtf/SegmentedVector.h"
+#include "../wtf/Assertions.h"
 
 #define ASSEMBLER_HAS_CONSTANT_POOL 1
 

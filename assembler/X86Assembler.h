@@ -30,16 +30,16 @@
 #ifndef X86Assembler_h
 #define X86Assembler_h
 
-#include "assembler/wtf/Platform.h"
+#include <stdint.h>
+
+#include "../wtf/Platform.h"
+#include "../wtf/Standalone.h"
 
 #if ENABLE_ASSEMBLER && (WTF_CPU_X86 || WTF_CPU_X86_64)
 
 #include "AssemblerBuffer.h"
-#include "jsstdint.h"
-#include "assembler/wtf/Assertions.h"
-#include "jsvector.h"
+#include "../wtf/Assertions.h"
 
-#include "methodjit/Logging.h"
 #define IPFX  "        %s"
 #define ISPFX "        "
 #ifdef JS_METHODJIT_SPEW

@@ -1,0 +1,2 @@
+This is a standalone version of WebKit's Nitro assembler, forked from the mozilla-central version. Use 'scons' to build the test program.
+

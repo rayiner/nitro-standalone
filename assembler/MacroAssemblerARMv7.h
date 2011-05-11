@@ -31,7 +31,7 @@
 #ifndef MacroAssemblerARMv7_h
 #define MacroAssemblerARMv7_h
 
-#include "assembler/wtf/Platform.h"
+#include "../wtf/Platform.h"
 
 #if ENABLE(ASSEMBLER)
 

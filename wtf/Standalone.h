@@ -23,30 +23,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#include "ExecutableAllocator.h"
+#ifndef Standalone_h
+#define Standalone_h
 
-#if ENABLE_ASSEMBLER
+#define JS_ASSERT(x) ASSERT(x)
+#define JS_ASSERT_IF(cond, x) if(cond) ASSERT(x)
 
-namespace JSC {
+namespace js {
+     enum JaegerSpewChannel {
+	  JSpew_Abort,
+	  JSpew_Scripts,
+	  JSpew_Prof,
+	  JSpew_JSOps,
+	  JSpew_Insns,
+	  JSpew_VMFrame,
+	  JSpew_PICs,
+	  JSpew_SlowCalls,
+	  JSPew_Terminator
+     };
 
-size_t ExecutableAllocator::pageSize = 0;
-size_t ExecutableAllocator::largeAllocSize = 0;
+     static inline void JaegerSpew(JaegerSpewChannel channel, const char *fmt, ...)
+     {
+     }
+};
 
-ExecutablePool::~ExecutablePool()
-{
-    m_allocator->releasePoolPages(this);
-}
-
-size_t
-ExecutableAllocator::getCodeSize() const
-{
-    size_t n = 0;
-    for(ExecPoolHashSet::iterator r = m_pools.begin(); r != m_pools.end(); ++r) {
-      n += (*r)->m_allocation.size;
-    }
-    return n;
-}
-
-}
-
-#endif // HAVE(ASSEMBLER)
+#endif

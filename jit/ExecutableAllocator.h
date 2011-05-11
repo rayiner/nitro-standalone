@@ -28,13 +28,12 @@
 
 #include <stddef.h> // for ptrdiff_t
 #include <limits>
-#include "assembler/wtf/Assertions.h"
+#include <vector>
+#include <set>
 
-#include "jsapi.h"
-#include "jshashtable.h"
-#include "jsprvtd.h"
-#include "jsvector.h"
-#include "jslock.h"
+#include "../wtf/Assertions.h"
+
+#include "../wtf/Standalone.h"
 
 #if WTF_CPU_SPARC
 #ifdef linux  // bugzilla 502369
@@ -83,8 +82,6 @@ namespace JSC {
 
   // These are reference-counted. A new one starts with a count of 1. 
   class ExecutablePool {
-
-    JS_DECLARE_ALLOCATION_FRIENDS_FOR_PRIVATE_CONSTRUCTOR;
     friend class ExecutableAllocator;
 private:
     struct Allocation {
@@ -116,7 +113,7 @@ public:
         JS_ASSERT(m_refCount != 0);
         JS_ASSERT_IF(willDestroy, m_refCount = 1);
         if (--m_refCount == 0) {
-            js::UnwantedForeground::delete_(this);
+	    delete this;
         }
     }
 
@@ -175,7 +172,7 @@ public:
 
     ~ExecutableAllocator()
     {
-        for (size_t i = 0; i < m_smallPools.length(); i++)
+        for (size_t i = 0; i < m_smallPools.size(); i++)
             m_smallPools[i]->release(/* willDestroy = */true);
         JS_ASSERT(m_pools.empty());     // if this asserts we have a pool leak
     }
@@ -208,7 +205,8 @@ public:
     void releasePoolPages(ExecutablePool *pool) {
         JS_ASSERT(pool->m_allocation.pages);
         systemRelease(pool->m_allocation);
-        m_pools.remove(m_pools.lookup(pool));   // this asserts if |pool| is not in m_pools
+	ExecPoolHashSet::iterator itr = m_pools.find(pool);
+	if(itr != m_pools.end()) m_pools.erase(itr);
     }
 
     size_t getCodeSize() const;
@@ -247,9 +245,6 @@ private:
         if (allocSize == OVERSIZE_ALLOCATION)
             return NULL;
 
-        if (!m_pools.initialized() && !m_pools.init())
-            return NULL;
-
 #ifdef DEBUG_STRESS_JSC_ALLOCATOR
         ExecutablePool::Allocation a = systemAlloc(size_t(4294967291));
 #else
@@ -258,15 +253,16 @@ private:
         if (!a.pages)
             return NULL;
 
-        ExecutablePool *pool = js::OffTheBooks::new_<ExecutablePool>(this, a);
+	ExecutablePool *pool = new ExecutablePool(this, a);
         if (!pool) {
             systemRelease(a);
             return NULL;
         }
-        m_pools.put(pool);
+        m_pools.insert(pool);
         return pool;
     }
 
+public:
     ExecutablePool* poolForSize(size_t n)
     {
 #ifndef DEBUG_STRESS_JSC_ALLOCATOR
@@ -276,7 +272,7 @@ private:
         // allocation fitting in a small pool, and (b) it minimizes the
         // potential waste when a small pool is next abandoned.
         ExecutablePool *minPool = NULL;
-        for (size_t i = 0; i < m_smallPools.length(); i++) {
+        for (size_t i = 0; i < m_smallPools.size(); i++) {
             ExecutablePool *pool = m_smallPools[i];
             if (n <= pool->available() && (!minPool || pool->available() < minPool->available()))
                 minPool = pool;
@@ -297,14 +293,14 @@ private:
             return NULL;
   	    // At this point, local |pool| is the owner.
 
-        if (m_smallPools.length() < maxSmallPools) {
+        if (m_smallPools.size() < maxSmallPools) {
             // We haven't hit the maximum number of live pools;  add the new pool.
-            m_smallPools.append(pool);
+            m_smallPools.push_back(pool);
             pool->addRef();
         } else {
             // Find the pool with the least space.
             int iMin = 0;
-            for (size_t i = 1; i < m_smallPools.length(); i++)
+            for (size_t i = 1; i < m_smallPools.size(); i++)
                 if (m_smallPools[i]->available() <
                     m_smallPools[iMin]->available())
                 {
@@ -434,14 +430,14 @@ private:
 
     // These are strong references;  they keep pools alive.
     static const size_t maxSmallPools = 4;
-    typedef js::Vector<ExecutablePool *, maxSmallPools, js::SystemAllocPolicy> SmallExecPoolVector;
+    typedef std::vector<ExecutablePool*> SmallExecPoolVector;
     SmallExecPoolVector m_smallPools;
 
     // All live pools are recorded here, just for stats purposes.  These are
     // weak references;  they don't keep pools alive.  When a pool is destroyed
     // its reference is removed from m_pools.
-    typedef js::HashSet<ExecutablePool *, js::DefaultHasher<ExecutablePool *>, js::SystemAllocPolicy>
-            ExecPoolHashSet;
+    typedef std::set<ExecutablePool*> ExecPoolHashSet;
+
     ExecPoolHashSet m_pools;    // All pools, just for stats purposes.
 
     static size_t determinePageSize();

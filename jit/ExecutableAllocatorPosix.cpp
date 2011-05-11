@@ -29,7 +29,7 @@
 
 #include <sys/mman.h>
 #include <unistd.h>
-#include <wtf/VMTags.h>
+#include "../wtf/VMTags.h"
 
 namespace JSC {
 

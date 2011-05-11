@@ -30,10 +30,12 @@
 #ifndef AbstractMacroAssembler_h
 #define AbstractMacroAssembler_h
 
-#include "assembler/wtf/Platform.h"
-#include "assembler/assembler/MacroAssemblerCodeRef.h"
-#include "assembler/assembler/CodeLocation.h"
-#include "jsstdint.h"
+#include <stdint.h>
+
+#include "../wtf/Platform.h"
+
+#include "MacroAssemblerCodeRef.h"
+#include "CodeLocation.h"
 
 #if ENABLE_ASSEMBLER
 
@@ -227,9 +229,9 @@ public:
         union {
             struct {
 #if WTF_CPU_BIG_ENDIAN || WTF_CPU_MIDDLE_ENDIAN
-                uint32 msb, lsb;
+                uint32_t msb, lsb;
 #else
-                uint32 lsb, msb;
+                uint32_t lsb, msb;
 #endif
             } s;
             uint64_t u64;
@@ -409,11 +411,11 @@ public:
         friend class LinkBuffer;
 
     public:
-        typedef js::Vector<Jump, 16 ,js::SystemAllocPolicy > JumpVector;
+        typedef std::vector<Jump> JumpVector;
 
         void link(AbstractMacroAssembler<AssemblerType>* masm)
         {
-            size_t size = m_jumps.length();
+            size_t size = m_jumps.size();
             for (size_t i = 0; i < size; ++i)
                 m_jumps[i].link(masm);
             m_jumps.clear();
@@ -421,7 +423,7 @@ public:
         
         void linkTo(Label label, AbstractMacroAssembler<AssemblerType>* masm)
         {
-            size_t size = m_jumps.length();
+            size_t size = m_jumps.size();
             for (size_t i = 0; i < size; ++i)
                 m_jumps[i].linkTo(label, masm);
             m_jumps.clear();
@@ -429,17 +431,17 @@ public:
         
         void append(Jump jump)
         {
-            m_jumps.append(jump);
+            m_jumps.push_back(jump);
         }
         
         void append(JumpList& other)
         {
-            m_jumps.append(other.m_jumps.begin(), other.m_jumps.length());
+            m_jumps.insert(m_jumps.end(), other.begin(), other.end());
         }
 
         bool empty()
         {
-            return !m_jumps.length();
+            return !m_jumps.size();
         }
         
         const JumpVector& jumps() { return m_jumps; }

@@ -13,12 +13,12 @@
 #define USE_SYSTEM_MALLOC 1
 // leads to FORCE_SYSTEM_MALLOC in wtf/FastMalloc.cpp
 
-#include <jit/ExecutableAllocator.h>
-#include <assembler/LinkBuffer.h>
-#include <assembler/CodeLocation.h>
-#include <assembler/RepatchBuffer.h>
+#include "jit/ExecutableAllocator.h"
+#include "assembler/LinkBuffer.h"
+#include "assembler/CodeLocation.h"
+#include "assembler/RepatchBuffer.h"
 
-#include <assembler/MacroAssembler.h>
+#include "assembler/MacroAssembler.h"
 
 #include <stdio.h>
 
@@ -110,7 +110,8 @@ void test1 ( void )
 
   // constructor for LinkBuffer asks ep to allocate r-x memory,
   // then copies it there.
-  JSC::LinkBuffer patchBuffer(am, ep);
+  bool ok;
+  JSC::LinkBuffer patchBuffer(am, eal, &ep, &ok);
 
   // finalize
   JSC::MacroAssemblerCodeRef cr = patchBuffer.finalizeCode();
@@ -266,7 +267,8 @@ void test2 ( void )
 
   // constructor for LinkBuffer asks ep to allocate r-x memory,
   // then copies it there.
-  JSC::LinkBuffer patchBuffer(am, ep);
+  bool ok;
+  JSC::LinkBuffer patchBuffer(am, eal, &ep, &ok);
 
   // finalize
   JSC::MacroAssemblerCodeRef cr = patchBuffer.finalizeCode();
@@ -453,7 +455,8 @@ void test3 ( void )
 
   // constructor for LinkBuffer asks ep to allocate r-x memory,
   // then copies it there.
-  JSC::LinkBuffer patchBuffer(am, ep);
+  bool ok;
+  JSC::LinkBuffer patchBuffer(am, eal, &ep, &ok);
 
   // finalize
   JSC::MacroAssemblerCodeRef cr = patchBuffer.finalizeCode();
@@ -663,7 +666,8 @@ void test4 ( void )
 
   // constructor for LinkBuffer asks ep to allocate r-x memory,
   // then copies it there.
-  JSC::LinkBuffer patchBuffer(am, ep);
+  bool ok;
+  JSC::LinkBuffer patchBuffer(am, eal, &ep, &ok);
 
   // now fix up any branches/calls
   //JSC::FunctionPtr target = JSC::FunctionPtr::FunctionPtr( &cube );
@@ -869,7 +873,8 @@ void test5 ( void )
 
   // constructor for LinkBuffer asks ep to allocate r-x memory,
   // then copies it there.
-  JSC::LinkBuffer patchBuffer(am, ep);
+  bool ok;
+  JSC::LinkBuffer patchBuffer(am, eal, &ep, &ok);
 
   // now fix up any branches/calls
   JSC::FunctionPtr target = JSC::FunctionPtr::FunctionPtr( &cube );
@@ -902,7 +907,7 @@ void test5 ( void )
   JSC::MacroAssemblerCodePtr cp
      = JSC::MacroAssemblerCodePtr( ((char*)entry) + offset_of_call_insn );
 
-  JSC::RepatchBuffer repatchBuffer(&cb);
+  JSC::RepatchBuffer repatchBuffer(jc);
   repatchBuffer.relink( JSC::CodeLocationCall(cp),
                         JSC::FunctionPtr::FunctionPtr( &square ));
  

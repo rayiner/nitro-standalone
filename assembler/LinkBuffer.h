@@ -34,7 +34,7 @@
 
 #if ENABLE_ASSEMBLER
 
-#include "../MacroAssembler.h"
+#include "MacroAssembler.h"
 
 namespace JSC {
 
@@ -85,7 +85,7 @@ public:
     {
     }
 
-    LinkBuffer(uint8* ncode, size_t size)
+    LinkBuffer(uint8_t* ncode, size_t size)
         : m_executablePool(NULL)
         , m_code(ncode)
         , m_size(size)
@@ -115,7 +115,7 @@ public:
 
     void link(JumpList list, CodeLocationLabel label)
     {
-        for (unsigned i = 0; i < list.m_jumps.length(); ++i)
+        for (unsigned i = 0; i < list.m_jumps.size(); ++i)
             MacroAssembler::linkJump(code(), list.m_jumps[i], label);
     }
 
